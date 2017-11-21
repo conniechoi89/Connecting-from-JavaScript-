@@ -11,16 +11,44 @@ const client = new pg.Client({
   ssl      : settings.ssl
 });
 
+// client.connect((err) => {
+//   if (err) {
+//     return console.error("Connection Error", err);
+//   }
+//   client.query("SELECT * FROM famous_people WHERE first_name = $1 OR last_name = $1", [args[0]], (err, result) => {
+//     if (err) {
+//       return console.error("error running query", err);
+//     }
+//    console.log(result.rows)
+//     client.end();
+//   });
+// });
+
+/**
+ * Function to search famous people by first or last name
+ * @param {string} name
+ * @param {function} cb
+ */
+
+function lookUpPeopleByName(name, cb) {
+  client.query("SELECT * FROM famous_people WHERE first_name = $1 OR last_name = $1", [name], cb);
+}
+
 client.connect((err) => {
   if (err) {
-    return console.error("Connection Error", err);
+    console.error("Connection Error", err);
+    return;
   }
-  client.query("SELECT * FROM famous_people WHERE first_name = $1 OR last_name = $1", [args[0]], (err, result) => {
-    if (err) {
-      return console.error("error running query", err);
-    }
-   console.log(result.rows)
-    client.end();
+  lookUpPeopleByName(args[0], (err,result) => {
+      if (err) {
+        console.error("error running query", err);
+        return;
+      }
+      console.log(result.rows[0]);
+      client.end();
   });
 });
+
+
+
 
